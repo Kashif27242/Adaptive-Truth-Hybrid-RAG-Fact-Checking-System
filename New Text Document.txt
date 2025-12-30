@@ -1,0 +1,76 @@
+Project Title: Adaptive Truth: A Hybrid RAG Framework for Automated Fact-Checking Using
+Static Knowledge Bases and Dynamic Web Search
+1. Project Objective
+The proliferation of misinformation (&quot;fake news&quot;) and the rapid decay of information validity
+present a significant challenge for modern AI systems. 1 Traditional Large Language Models
+(LLMs) suffer from &quot;knowledge cutoffs&quot; and hallucinations, while standard Retrieval-Augmented
+Generation (RAG) systems rely solely on static, pre-indexed databases that may be outdated.
+
+The primary objective of this project is to develop an &quot;Adaptive Fact-Checking System&quot;
+that intelligently verifies user claims by cross-referencing two distinct information
+sources: a curated, trusted static dataset (FEVER) and real-time internet search results
+(Google Search).
+Specifically, this project aims to achieve the following:
+● Demonstrate Hybrid Retrieval: Build a pipeline that queries a local vector database for
+established facts and triggers a live Google Search only when the local evidence is
+insufficient, outdated, or conflicting.
+● Mitigate Hallucination: Reduce the rate of false positives by requiring the model to cite
+evidence from either the static corpus or a live URL before validating a claim.
+● Resolve Temporal Conflicts: Develop a logic layer that can adjudicate between &quot;old truth&quot;
+(e.g., &quot;The Queen is alive&quot; in a 2021 dataset) and &quot;new truth&quot; (e.g., current news) to
+provide an accurate, up-to-date verdict.
+2. Dataset
+To ensure academic rigor and reproducibility, this project will utilize the FEVER (Fact
+Extraction and VERification) dataset as the primary static knowledge base.
+● Source &amp; Size: The FEVER dataset consists of over 185,000 claims manually verified
+against Wikipedia pages. It is a standard benchmark in the NLP community for Natural
+Language Inference (NLI) and fact-checking tasks. 2
+● Why it is Appropriate: FEVER provides &quot;gold standard&quot; labeled data (Supported, Refuted,
+or NotEnoughInfo). This allows us to quantitatively measure the system&#39;s baseline
+performance.
+
+● Dynamic Component: In addition to FEVER, the &quot;live&quot; dataset will be constructed
+dynamically using the Google Custom Search JSON API (or SerpApi). This allows the
+system to fetch snippets from trusted news domains (e.g., BBC, Reuters, Dawn) when the
+FEVER dataset lacks information on a specific claim (e.g., breaking news from 2025).
+3. Method
+The proposed system will implement an Agentic RAG architecture. Instead of a linear pipeline,
+the system will function as an intelligent agent with decision-making capabilities.
+A. Architecture Components:
+1. Query Router (The &quot;Brain&quot;): An LLM-based classifier (using Llama 3 or GPT-4o-mini)
+that analyzes the input claim. It assigns a &quot;need for freshness&quot; score. If the query is
+historical/scientific, it routes to the Local DB. If it is news/current events, it routes to Web
+Search.
+2. Vector Store (Local Retrieval): The FEVER dataset will be chunked and embedded using
+a dense retrieval model (e.g., sentence-transformers/all-MiniLM-L6-v2) and stored in a
+vector database (e.g., FAISS or ChromaDB).
+3. Web Search Tool (Dynamic Retrieval): A wrapper around the Google Search API to fetch
+the top $k$ relevant URLs and snippets for claims identified as &quot;current&quot; or &quot;missing&quot; from
+the local DB.
+4. The Adjudicator (Reasoning Engine): This is the core novelty. An LLM that receives
+context from both sources and applies a &quot;Conflict Resolution Protocol.&quot;
+B. Algorithmic Approach:
+● The system will use Chain-of-Thought (CoT) prompting to break the verification into
+steps:
+1. Identify key entities in the claim.
+2. Retrieve evidence from FEVER.
+3. Check confidence score.
+4. If confidence &lt; Threshold OR evidence is dated -&gt; Trigger Google Search.
+5. Compare Local Evidence vs. Web Evidence.
+6. Final Verdict.
+4. Novelty / Uniqueness
+While basic RAG systems are common, this project introduces specific novelties relevant to the
+current state of AI research:
+1. Conflict Resolution Logic: Most RAG systems simply concatenate retrieved text. This
+project focuses on the logic of contradiction. How does the system decide who to trust
+when the Wikipedia dump says X but the Google snippet says Y? I will implement a
+&quot;recency-weighted&quot; trust score to handle these collisions.
+2. Cost-Optimized Intelligence: By prioritizing the local FEVER dataset and only using
+Google Search (which is computationally slower and often paid via API) when necessary,
+
+the system demonstrates an efficient &quot;Adaptive Computation&quot; strategy suitable for real-
+world deployment.
+3. Personal Learning Goal: This project will allow me to master the orchestration of
+LangChain/LangGraph agents and explore the intersection of classical Information
+Retrieval (IR) and modern Generative AI, specifically in the domain of automated truth
+verification.
