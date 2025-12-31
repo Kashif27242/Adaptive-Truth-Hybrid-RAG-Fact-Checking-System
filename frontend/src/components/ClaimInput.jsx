@@ -11,17 +11,21 @@ const ClaimInput = ({ onVerify, isLoading }) => {
   };
 
   return (
-    <div className="claim-input-container">
-      <form onSubmit={handleSubmit}>
+    <div className="claim-input-container input-card">
+      <form onSubmit={handleSubmit} className="card">
         <textarea
           value={claim}
           onChange={(e) => setClaim(e.target.value)}
-          placeholder="Enter a claim to verify (e.g., 'The Queen is alive')"
-          rows={4}
+          placeholder="Enter a claim to verify (e.g., 'The Queen is alive')..."
+          rows={3}
           disabled={isLoading}
         />
         <button type="submit" disabled={isLoading || !claim.trim()}>
-          {isLoading ? 'Verifying...' : 'Verify Claim'}
+          {isLoading ? (
+            <span>Running Agentic Verification...</span>
+          ) : (
+            'Verify Claim'
+          )}
         </button>
       </form>
     </div>

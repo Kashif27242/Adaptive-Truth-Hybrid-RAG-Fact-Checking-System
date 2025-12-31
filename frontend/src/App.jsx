@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import ClaimInput from './components/ClaimInput';
 import VerificationResult from './components/VerificationResult';
-import './App.css';
 
 function App() {
   const [result, setResult] = useState(null);
@@ -45,7 +44,11 @@ function App() {
       <main>
         <ClaimInput onVerify={handleVerify} isLoading={isLoading} />
 
-        {error && <div className="error">{error}</div>}
+        {error && (
+          <div className="card" style={{ borderColor: 'var(--danger)', color: 'var(--danger)', marginTop: '2rem' }}>
+            <strong>Error:</strong> {error}
+          </div>
+        )}
 
         <VerificationResult result={result} />
       </main>

@@ -5,30 +5,57 @@ const VerificationResult = ({ result }) => {
 
     const { verdict, reasoning, evidence } = result;
 
-    const getVerdictColor = (v) => {
+    const getStatusClass = (v) => {
         switch (v.toLowerCase()) {
-            case 'supported': return 'green';
-            case 'refuted': return 'red';
-            default: return 'orange';
+            case 'supported': return 'status-supported';
+            case 'refuted': return 'status-refuted';
+            default: return 'status-uncertain';
         }
     };
 
     return (
-        <div className="result-container">
-            <h2>Verdict: <span style={{ color: getVerdictColor(verdict) }}>{verdict}</span></h2>
-            <p className="reasoning">{reasoning}</p>
+        <div className="card result-container animate-fade-in">
+            <div className="result-status">
+                <span className={`status-badge ${getStatusClass(verdict)}`}>
+                    {verdict}
+                </span>
+                <h2>Verification Analysis</h2>
+            </div>
 
-            <h3>Evidence:</h3>
-            <ul>
-                {evidence.map((item, index) => (
-                    <li key={index}>
-                        <strong>[{item.source}]</strong> {item.text}
-                        {item.url && <a href={item.url} target="_blank" rel="noopener noreferrer"> (Link)</a>}
-                        <br />
-                        <small>Confidence: {item.confidence}</small>
-                    </li>
-                ))}
-            </ul>
+            <div className="reasoning">
+                <strong>AI Reasoning:</strong>
+                <p>{reasoning}</p>
+            </div>
+
+            <div className="evidence-section">
+                <h3>Supporting Evidence</h3>
+                <div className="evidence-grid">
+                    {evidence.map((item, index) => (
+                        <div key={index} className="evidence-card">
+                            <span className="evidence-source">
+                                {(item.source.toLowerCase().includes('local') || item.source.toLowerCase().includes('chroma') || item.source.includes('Pinecone')) ? '📂 Local Knowledge' : '🌐 Web Search'}
+                            </span>
+                            <p className="evidence-text">"{item.text}"</p>
+                            {item.url && (
+                                <a
+                                    href={item.url}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    style={{ color: 'var(--accent-primary)', fontSize: '0.9rem' }}
+                                >
+                                    View Source
+                                </a>
+                            )}
+                            <div className="confidence-bar" title={`Confidence: ${item.confidence}`}>
+                                <div
+                                    className="confidence-fill"
+                                    style={{ width: `${item.confidence * 100}%` }}
+                                ></div>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </div>
         </div>
     );
 };

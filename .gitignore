@@ -13,4 +13,6 @@ dist/
 # Project specific
 backend/chroma_db/
 backend/data/
+chroma_db/
+data/
 .gemini/

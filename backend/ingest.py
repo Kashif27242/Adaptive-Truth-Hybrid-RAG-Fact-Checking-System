@@ -1,12 +1,15 @@
+import os
+import json
+import requests
 import chromadb
 from chromadb.utils import embedding_functions
-import requests
-import json
-import os
+from tqdm import tqdm
 
 DATA_DIR = "data"
 DATA_FILE = os.path.join(DATA_DIR, "fever.jsonl")
 URL = "https://fever.ai/download/fever/shared_task_dev.jsonl"
+CHROMA_DB_PATH = "chroma_db"
+COLLECTION_NAME = "fever-facts"
 
 def download_data():
     if not os.path.exists(DATA_DIR):
@@ -28,54 +31,68 @@ def ingest_data():
     download_data()
 
     print("Initializing ChromaDB...")
-    client = chromadb.PersistentClient(path="./chroma_db")
+    client = chromadb.PersistentClient(path=CHROMA_DB_PATH)
     
-    # Use a standard embedding model
-    sentence_transformer_ef = embedding_functions.SentenceTransformerEmbeddingFunction(model_name="all-MiniLM-L6-v2")
+    # Use accurate embedding model
+    ef = embedding_functions.SentenceTransformerEmbeddingFunction(model_name="all-MiniLM-L6-v2")
     
-    collection = client.get_or_create_collection(name="fever_facts", embedding_function=sentence_transformer_ef)
+    # Get or create collection
+    try:
+        collection = client.get_collection(name=COLLECTION_NAME, embedding_function=ef)
+        print(f"Collection '{COLLECTION_NAME}' already exists. Appending strictly new data is tricky without ID checks. For now, we assume clean slate or overwrite logic if needed.")
+        # Optional: client.delete_collection(COLLECTION_NAME) to start fresh
+    except:
+        print(f"Creating collection '{COLLECTION_NAME}'...")
+        collection = client.create_collection(name=COLLECTION_NAME, embedding_function=ef)
+
+    print(f"Processing {DATA_FILE}...")
     
+    batch_size = 500 # ChromaDB handles batches well
     documents = []
     metadatas = []
     ids = []
     
-    print(f"Processing {DATA_FILE}...")
     count = 0
-    print(f"Processing {DATA_FILE}...")
-    count = 0
-    # Process entire file
+    total_processed = 0
+    
+    # Count total lines for progress bar (optional, but good for UX)
+    # total_lines = sum(1 for _ in open(DATA_FILE, 'r', encoding='utf-8')) 
     
     with open(DATA_FILE, 'r', encoding='utf-8') as f:
-        for i, line in enumerate(f):
-            if line:
-                try:
-                    data = json.loads(line)
-                    # FEVER labels are SUPPORTS, REFUTES, NOT ENOUGH INFO
-                    if data['label'] == 'SUPPORTS':
-                        documents.append(data['claim'])
-                        metadatas.append({"source": "FEVER", "label": data['label']})
-                        ids.append(str(data['id']))
-                        count += 1
-                        
-                        if count % 1000 == 0:
-                            print(f"Processed {count} supported claims...")
-                except Exception as e:
-                    pass
+        for line in tqdm(f, desc="Ingesting facts"):
+            try:
+                data = json.loads(line)
+                # Only store SUPPORTED claims as "facts"
+                if data['label'] == 'SUPPORTS':
+                    documents.append(data['claim'])
+                    metadatas.append({"source": "FEVER", "label": data['label'], "text": data['claim']})
+                    ids.append(str(data['id']))
+                    count += 1
+                    
+                    if count >= batch_size:
+                        collection.add(
+                            documents=documents,
+                            metadatas=metadatas,
+                            ids=ids
+                        )
+                        total_processed += count
+                        documents = []
+                        metadatas = []
+                        ids = []
+                        count = 0
+            except Exception as e:
+                pass # Skip malformed lines
 
+    # Upsert remaining
     if documents:
-        print(f"Adding {len(documents)} documents to ChromaDB...")
-        # Upsert in batches to avoid payload limits
-        batch_size = 100
-        for i in range(0, len(documents), batch_size):
-            collection.upsert(
-                documents=documents[i:i+batch_size],
-                metadatas=metadatas[i:i+batch_size],
-                ids=ids[i:i+batch_size]
-            )
-            if i % 1000 == 0:
-                print(f"Upserted batch {i} to {i+batch_size}")
-            
-    print("Ingestion complete!")
+        collection.add(
+            documents=documents,
+            metadatas=metadatas,
+            ids=ids
+        )
+        total_processed += count
+
+    print(f"Ingestion complete! Total facts stored: {total_processed}")
 
 if __name__ == "__main__":
     ingest_data()
