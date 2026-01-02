@@ -1,0 +1,12 @@
+
+langchain
+langchain-google-genai
+chromadb
+sentence-transformers
+pinecone
+python-dotenv
+requests
+beautifulsoup4
+streamlit
+
+
