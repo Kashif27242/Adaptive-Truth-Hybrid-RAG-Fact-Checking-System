@@ -3,7 +3,6 @@ __pycache__/
 *.py[cod]
 *$py.class
 venv/
-.env
 
 # Node
 node_modules/
@@ -16,3 +15,4 @@ backend/data/
 chroma_db/
 data/
 .gemini/
+config.bat
