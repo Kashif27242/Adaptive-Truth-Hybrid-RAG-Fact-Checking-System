@@ -1,5 +1,4 @@
-fastapi
-uvicorn
+
 langchain
 langchain-google-genai
 chromadb
@@ -8,5 +7,6 @@ pinecone
 python-dotenv
 requests
 beautifulsoup4
+streamlit
 
 
