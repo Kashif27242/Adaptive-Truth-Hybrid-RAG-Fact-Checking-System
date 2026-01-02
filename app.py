@@ -33,24 +33,90 @@ st.set_page_config(
 # --- UI Components ---
 
 def apply_custom_styles():
-    """Injects custom CSS for a polished, dark-themed UI."""
+    """Injects custom CSS for a polished, dark-themed UI with gradients."""
     st.markdown("""
         <style>
-        .stApp { background-color: #0f172a; color: #f8fafc; }
+        /* Main Background */
+        .stApp {
+            background: rgb(15,23,42);
+            background: linear-gradient(135deg, rgba(15,23,42,1) 0%, rgba(30,58,138,1) 50%, rgba(15,23,42,1) 100%);
+            color: #f8fafc;
+        }
+        
+        /* Inputs & Text Areas */
         .stTextInput > div > div > input, .stTextArea > div > div > textarea {
-            background-color: #1e293b; color: #f8fafc; border-color: #334155;
+            background-color: rgba(30, 41, 59, 0.6); 
+            backdrop-filter: blur(10px);
+            color: #f8fafc; 
+            border: 1px solid rgba(148, 163, 184, 0.2);
+            border-radius: 10px;
         }
+        .stTextInput > div > div > input:focus, .stTextArea > div > div > textarea:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+        }
+
+        /* Status Badges */
         .status-badge {
-            font-weight: bold; padding: 0.5rem 1.5rem; border-radius: 99px;
-            text-transform: uppercase; font-size: 1.2rem; display: inline-block;
+            font-weight: 700; 
+            padding: 0.6rem 2rem; 
+            border-radius: 99px;
+            text-transform: uppercase; 
+            letter-spacing: 1px;
+            font-size: 1.1rem; 
+            display: inline-block;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            backdrop-filter: blur(5px);
         }
-        .status-supported { color: #34d399; border: 2px solid #34d399; background: rgba(52, 211, 153, 0.1); }
-        .status-refuted { color: #f87171; border: 2px solid #f87171; background: rgba(248, 113, 113, 0.1); }
-        .status-info { color: #fbbf24; border: 2px solid #fbbf24; background: rgba(251, 191, 36, 0.1); }
+        .status-supported { 
+            color: #a7f3d0; 
+            border: 1px solid #34d399; 
+            background: linear-gradient(90deg, rgba(6,78,59,0.6) 0%, rgba(16,185,129,0.3) 100%);
+        }
+        .status-refuted { 
+            color: #fecaca; 
+            border: 1px solid #f87171; 
+            background: linear-gradient(90deg, rgba(127,29,29,0.6) 0%, rgba(2ef4444,0.3) 100%); 
+        }
+        .status-info { 
+            color: #fde68a; 
+            border: 1px solid #fbbf24; 
+            background: linear-gradient(90deg, rgba(120,53,15,0.6) 0%, rgba(245,158,11,0.3) 100%);
+        }
+
+        /* Evidence Cards (Glassmorphism) */
         .evidence-card {
-            background: #1e293b; padding: 1rem; border-radius: 8px; margin-bottom: 0.5rem;
+            background: rgba(30, 41, 59, 0.4);
+            padding: 1.2rem; 
+            border-radius: 12px; 
+            margin-bottom: 0.8rem;
+            border: 1px solid rgba(255,255,255,0.05);
             border-left: 4px solid #3b82f6;
+            backdrop-filter: blur(5px);
+            transition: transform 0.2s ease;
         }
+        .evidence-card:hover {
+            transform: translateY(-2px);
+            background: rgba(30, 41, 59, 0.6);
+            border-left-color: #60a5fa;
+        }
+        
+        /* Buttons */
+        .stButton > button {
+            background: linear-gradient(90deg, #2563eb 0%, #3b82f6 100%);
+            border: none;
+            color: white;
+            font-weight: bold;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+        .stButton > button:hover {
+            box-shadow: 0 0 20px rgba(37, 99, 235, 0.6);
+            transform: scale(1.02);
+        }
+        
+        /* Divider */
+        hr { border-color: rgba(148, 163, 184, 0.2); }
         </style>
     """, unsafe_allow_html=True)
 
