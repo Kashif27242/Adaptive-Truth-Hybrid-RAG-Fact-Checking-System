@@ -36,11 +36,6 @@ const VerificationResult = ({ result }) => {
                 >
                     {verdict}
                 </div>
-
-                <div className="source-context" style={{ color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}>
-                    <span>Verified using <strong>{sourceLabel}</strong></span>
-                    <span title={sourceLabel}>{sourceIcon}</span>
-                </div>
             </div>
 
             {/* Reasoning Section */}
