@@ -70,7 +70,7 @@ def ingest_data():
                     count += 1
                     
                     if count >= batch_size:
-                        collection.add(
+                        collection.upsert(
                             documents=documents,
                             metadatas=metadatas,
                             ids=ids
