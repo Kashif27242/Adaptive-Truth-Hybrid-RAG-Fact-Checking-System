@@ -164,7 +164,7 @@ def render_main_interface():
 
 def _handle_verification(claim: str):
     """Orchestrates the verification process and result rendering."""
-    with st.spinner("🤖 Analyzing... (Checking Local DB → Web)"):
+    with st.spinner("Analyzing... (Checking Local DB → Web)"):
         try:
             # Run async agent
             result = asyncio.run(verify_claim(claim))
